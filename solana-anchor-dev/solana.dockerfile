@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     git \
     openssh-client \
     bash-completion \
+    tmux \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js
@@ -42,8 +43,7 @@ RUN if [ -n "$SOLANA_VERSION" ]; then agave-install init $SOLANA_VERSION; fi
 RUN if [ -n "$ANCHOR_VERSION" ]; then avm install $ANCHOR_VERSION && avm use $ANCHOR_VERSION; fi
 
 # Install Claude Code
-RUN curl -fsSL https://claude.ai/install.sh | bash
-ENV PATH="$HOME/.local/bin:$PATH"
+RUN npm install -g @anthropic-ai/claude-code
 
 # Copy git aliases
 COPY gitconfig $HOME/.gitconfig
@@ -55,10 +55,11 @@ RUN curl -o /etc/bash_completion.d/git-completion.bash \
     https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Configure bashrc: ssh-agent + git completion + prompt (no colors)
-RUN echo 'eval "$(ssh-agent -s)"' >> $HOME/.bashrc && \
-    echo 'source /etc/bash_completion.d/git-completion.bash' >> $HOME/.bashrc && \
+RUN echo 'source /etc/bash_completion.d/git-completion.bash' >> $HOME/.bashrc && \
     echo 'source /etc/bash_completion.d/git-prompt.sh' >> $HOME/.bashrc && \
     echo 'export PS1="\u@\h:\w\$(__git_ps1 \" (%s)\")\$ "' >> $HOME/.bashrc
+
+RUN solana-keygen new --no-bip39-passphrase
 
 WORKDIR /workspace
 

@@ -5,7 +5,7 @@
 Build once
 
 ```sh
- docker build -f solana.dockerfile -t solana-anchor-dev .
+docker build -f solana.dockerfile -t solana-anchor-dev .
 ```
 
 Override specific versions
@@ -27,12 +27,23 @@ Arguments to configure
 
 Run with your SSH key mounted
 
-```
+```sh
 docker run -it --rm -v  ~/.ssh/id_ed25519_github:/root/.ssh/id_rsa:ro solana-anchor-dev
 ```
 
-Persist cloned code
+or sharing agent from local machine like
+
+```sh
+docker run -it --rm \
+    -v  ~/.ssh/id_ed25519_github:/root/.ssh/id_rsa:ro \
+    -v $SSH_AUTH_SOCK:/ssh-agent \
+    -e SSH_AUTH_SOCK=/ssh-agent \
+    solana-anchor-dev
 ```
+
+Persist cloned code
+
+```sh
 docker run -it --rm -v  ~/.ssh/id_ed25519_github:/root/.ssh/id_rsa:ro -v $(pwd)/projects:/workspace solana-anchor-dev
 ```
 
