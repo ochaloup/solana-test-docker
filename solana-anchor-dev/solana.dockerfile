@@ -1,24 +1,3 @@
-## HOWTO
-# Build once
-#  docker build -f solana.dockerfile -t solana-anchor-dev .
-# # Override specific versions
-#  docker build -f solana.dockerfile -t solana-anchor-dev --build-arg SOLANA_VERSION=2.3.1 --build-arg ANCHOR_VERSION=0.31.1 .
-#
-# Run with your SSH key mounted
-#  docker run -it --rm -v  ~/.ssh/id_ed25519_github:/root/.ssh/id_rsa:ro solana-anchor-dev
-
-# Persist cloned code
-#  docker run -it --rm -v  ~/.ssh/id_ed25519_github:/root/.ssh/id_rsa:ro -v $(pwd)/projects:/workspace solana-anchor-dev
-
-# Before cloning
-# ssh-add
-
-# ----- Change of version within the container -----
-# Rust: rustup install <version> && rustup default <version>
-# Solana: agave-install init <version>
-# Anchor: avm install <version> && avm use <version>
-# ---------------------------------------------------
-
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -36,7 +15,14 @@ RUN apt-get update && apt-get install -y \
     libudev-dev \
     git \
     openssh-client \
+    bash-completion \
     && rm -rf /var/lib/apt/lists/*
+
+# Install git completion
+RUN curl -o /etc/bash_completion.d/git-completion.bash \
+    https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && \
+    curl -o /etc/bash_completion.d/git-prompt.sh \
+    https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
@@ -63,8 +49,20 @@ RUN if [ -n "$ANCHOR_VERSION" ]; then avm install $ANCHOR_VERSION && avm use $AN
 RUN curl -fsSL https://claude.ai/install.sh | bash
 ENV PATH="/root/.local/bin:$PATH"
 
-# Start ssh-agent automatically
-RUN echo 'eval "$(ssh-agent -s)"' >> /root/.bashrc
+# Copy git aliases
+COPY gitconfig /root/.gitconfig
+
+# Install git completion
+RUN curl -o /etc/bash_completion.d/git-completion.bash \
+    https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && \
+    curl -o /etc/bash_completion.d/git-prompt.sh \
+    https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh
+
+# Configure bashrc: ssh-agent + git completion + prompt (no colors)
+RUN echo 'eval "$(ssh-agent -s)"' >> /root/.bashrc && \
+    echo 'source /etc/bash_completion.d/git-completion.bash' >> /root/.bashrc && \
+    echo 'source /etc/bash_completion.d/git-prompt.sh' >> /root/.bashrc && \
+    echo 'export PS1="\u@\h:\w\$(__git_ps1 \" (%s)\")\$ "' >> /root/.bashrc
 
 WORKDIR /workspace
 

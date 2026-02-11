@@ -1,0 +1,21 @@
+[alias]
+  co = checkout
+  ci = commit
+  st = status
+  br = branch
+  hist = log --pretty=format:\"%Cred%h%Creset %Cblue%cd%Creset (%Cblue%ad%Creset) | %s%d [%Cgreen%an%Creset]\" --graph --date=short
+  type = cat-file -t
+  dump = cat-file -p
+  up = pull --rebase --ff-only
+  files = show --pretty="format:" --name-only
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+  last = log --name-status HEAD^..HEAD
+  brtime = for-each-ref --count=25 --sort=-committerdate refs/heads/ --format='%(refname:short)'
+  missing = "!f() { git rev-list --header ..$1  | sed -e '1 iOnly in other:'; git rev-list --header $1.. | sed -e '1 iOnly in HEAD:'; }; f"
+  mrequest = push -u origin HEAD
+  asquash = rebase -i --autosquash
+  please = push --force-with-lease
+  commend = commit --amend --no-edit
+  grog = log --graph --abbrev-commit --decorate --all --format=format:\"%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(dim cyan) - %an%C(reset) %C(bold green)(%ar)%C(reset)%C(bold magenta)%d%C(reset)%n %C(magenta)%s%C(reset)\"
+  branch-name = "!git rev-parse --abbrev-ref HEAD"
+  publ = "!git push -u origin $(git branch-name)"
