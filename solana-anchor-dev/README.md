@@ -14,6 +14,15 @@ Override specific versions
 docker build -f solana.dockerfile -t solana-anchor-dev --build-arg SOLANA_VERSION=2.3.1 --build-arg ANCHOR_VERSION=0.31.1 .
 ```
 
+Arguments to configure
+
+```sh
+--build-arg RUST_VERSION=1.88.0
+--build-arg SOLANA_VERSION=2.3.1
+--build-arg ANCHOR_VERSION=0.32.1
+--build-arg NODE_VERSION=24
+```
+
 ## To run
 
 Run with your SSH key mounted
